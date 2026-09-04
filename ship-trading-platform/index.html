@@ -1,0 +1,893 @@
+<title>国际船舶交易服务平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+:root{
+  --paper:#ffffff; --mist:#f1f5f9; --panel:#ffffff; --rail:#f7f9fb;
+  --rule:#dbe3ec; --rule-soft:#e8eef4;
+  --ink:#0e2233; --ink-2:#41576b; --ink-3:#6f8496;
+  --azure:#1683c8; --azure-deep:#0f6ba6; --azure-soft:#e6f1fa;
+  --taupe:#a3937a; --taupe-soft:#f0ece4;
+  --ok:#1f7a5c; --ok-bg:#e4f2ec;
+  --warn:#b8791c; --warn-bg:#fbf0dd;
+  --crit:#b3372f; --crit-bg:#fbe8e6;
+  --idle:#6f8496; --idle-bg:#eef2f6;
+  --shadow:0 1px 2px rgba(14,34,51,.06), 0 10px 28px -14px rgba(14,34,51,.22);
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Noto Serif SC","Songti SC","SimSun",Georgia,serif;
+  --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0c1620; --mist:#111f2b; --panel:#142230; --rail:#0f1c27;
+    --rule:#24384a; --rule-soft:#1c2c3a;
+    --ink:#e6eef5; --ink-2:#a8bccd; --ink-3:#7891a6;
+    --azure:#4ea8e0; --azure-deep:#78c0ee; --azure-soft:#12293c;
+    --taupe:#c4b393; --taupe-soft:#231f18;
+    --ok:#4cbf95; --ok-bg:#102b23;
+    --warn:#d99b3f; --warn-bg:#2e2413;
+    --crit:#e0736a; --crit-bg:#2f1a18;
+    --idle:#7891a6; --idle-bg:#182734;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0c1620; --mist:#111f2b; --panel:#142230; --rail:#0f1c27;
+  --rule:#24384a; --rule-soft:#1c2c3a;
+  --ink:#e6eef5; --ink-2:#a8bccd; --ink-3:#7891a6;
+  --azure:#4ea8e0; --azure-deep:#78c0ee; --azure-soft:#12293c;
+  --taupe:#c4b393; --taupe-soft:#231f18;
+  --ok:#4cbf95; --ok-bg:#102b23;
+  --warn:#d99b3f; --warn-bg:#2e2413;
+  --crit:#e0736a; --crit-bg:#2f1a18;
+  --idle:#7891a6; --idle-bg:#182734;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:600;text-wrap:balance;margin:0}
+a{color:var(--azure)}
+:focus-visible{outline:2px solid var(--azure);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- demo banner ---------- */
+.demo-strip{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--taupe-soft);color:var(--ink-2);
+  border-bottom:1px solid var(--rule);
+  padding:7px 22px;font-size:12px;letter-spacing:.04em;
+}
+.demo-strip b{color:var(--taupe);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.demo-strip span{color:var(--ink-3)}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  padding:16px 22px;background:var(--panel);border-bottom:1px solid var(--rule);
+}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-mark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:2px;background:var(--azure);
+  display:grid;place-items:center;color:#fff;font-family:var(--serif);font-size:19px;line-height:1;
+}
+.brand-text h1{font-size:17px;letter-spacing:.02em;line-height:1.3}
+.brand-text p{margin:2px 0 0;font-size:11.5px;color:var(--ink-3);letter-spacing:.05em}
+.topbar-right{display:flex;align-items:center;gap:18px}
+.stamp{text-align:right;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+.stamp b{display:block;color:var(--ink-2);font-weight:500;font-family:var(--mono);font-size:12px}
+.theme-btn{
+  border:1px solid var(--rule);background:var(--mist);color:var(--ink-2);
+  border-radius:2px;padding:7px 12px;font-family:var(--sans);font-size:12px;cursor:pointer;
+}
+.theme-btn:hover{border-color:var(--azure);color:var(--azure)}
+
+/* ---------- shell ---------- */
+.shell{display:flex;min-height:calc(100vh - 118px);align-items:stretch}
+.rail{
+  flex:0 0 216px;background:var(--rail);border-right:1px solid var(--rule);
+  padding:18px 0;display:flex;flex-direction:column;gap:2px;
+}
+.rail-label{
+  padding:0 18px 8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+}
+.rail button{
+  display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;
+  border:0;border-left:3px solid transparent;background:none;cursor:pointer;
+  padding:9px 18px;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);
+}
+.rail button:hover{background:var(--azure-soft);color:var(--ink)}
+.rail button[aria-current="true"]{
+  border-left-color:var(--azure);background:var(--azure-soft);color:var(--azure-deep);font-weight:500;
+}
+.rail button i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--ink-3);width:14px}
+.rail button[aria-current="true"] i{color:var(--azure)}
+.rail-foot{margin-top:auto;padding:16px 18px 0;font-size:11px;color:var(--ink-3);line-height:1.6;border-top:1px solid var(--rule-soft)}
+
+main{flex:1;min-width:0;padding:26px 30px 60px;background:var(--paper)}
+.page-head{margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);font-weight:500}
+.page-head h2{font-size:23px;margin-top:5px}
+.page-head p{margin:7px 0 0;color:var(--ink-3);font-size:13px;max-width:66ch}
+
+/* ---------- tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:26px}
+.tile{background:var(--panel);padding:15px 17px}
+.tile .k{font-size:11px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+.tile .v{font-family:var(--mono);font-size:25px;font-weight:500;letter-spacing:-.01em;margin-top:5px;font-variant-numeric:tabular-nums}
+.tile .u{font-size:12px;color:var(--ink-3);margin-left:4px;font-family:var(--sans)}
+.tile .sub{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+
+/* ---------- pipeline ---------- */
+.pipeline{display:flex;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:26px;overflow-x:auto}
+.stage{background:var(--panel);flex:1 1 0;min-width:132px;padding:13px 15px 15px;position:relative}
+.stage::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--azure);opacity:.25}
+.stage.on::before{opacity:1}
+.stage .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.stage .t{font-size:12.5px;margin-top:3px;color:var(--ink-2)}
+.stage .c{font-family:var(--mono);font-size:20px;font-weight:500;margin-top:7px;font-variant-numeric:tabular-nums}
+
+/* ---------- panels & tables ---------- */
+.panel{background:var(--panel);border:1px solid var(--rule);margin-bottom:24px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:13px 17px;border-bottom:1px solid var(--rule)}
+.panel-head h3{font-size:15px}
+.panel-head .note{font-size:11.5px;color:var(--ink-3)}
+.panel-body{padding:17px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;font-weight:500;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);padding:9px 14px;border-bottom:1px solid var(--rule);white-space:nowrap;background:var(--mist);
+}
+td{padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.imo{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:var(--azure-soft)}
+.vname{font-weight:500;letter-spacing:.01em}
+.vname small{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;letter-spacing:0}
+
+/* ---------- chips ---------- */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:2px;font-size:11.5px;white-space:nowrap;line-height:1.5}
+.chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 5px}
+.chip.ok{color:var(--ok);background:var(--ok-bg)}
+.chip.warn{color:var(--warn);background:var(--warn-bg)}
+.chip.crit{color:var(--crit);background:var(--crit-bg)}
+.chip.live{color:var(--azure-deep);background:var(--azure-soft)}
+.chip.idle{color:var(--idle);background:var(--idle-bg)}
+
+/* ---------- vessel detail ---------- */
+.back-btn{border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);border-radius:2px;padding:6px 12px;font-family:var(--sans);font-size:12.5px;cursor:pointer;margin-bottom:16px}
+.back-btn:hover{border-color:var(--azure);color:var(--azure)}
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:940px){.detail-grid{grid-template-columns:1fr}}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule-soft);margin:0}
+.spec{background:var(--panel);padding:11px 14px}
+.spec dt{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.spec dd{margin:3px 0 0;font-size:14px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.spec dd.txt{font-family:var(--sans);font-size:13.5px}
+.price-block{padding:17px;border-bottom:1px solid var(--rule)}
+.price-block .lbl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.price-block .amt{font-family:var(--mono);font-size:27px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-.015em}
+.price-block .amt em{font-style:normal;font-size:14px;color:var(--ink-3);margin-right:5px}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--rule-soft);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv dt{color:var(--ink-3)}
+.kv dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kv dd.txt{font-family:var(--sans)}
+.doclist{list-style:none;margin:0;padding:0}
+.doclist li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule-soft);font-size:13px}
+.doclist li:last-child{border-bottom:0}
+.doclist .dn{display:flex;align-items:center;gap:9px;min-width:0}
+.doclist .dn i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);flex:0 0 auto}
+
+/* ---------- node timeline ---------- */
+.nodes{list-style:none;margin:0;padding:0}
+.node{display:grid;grid-template-columns:26px minmax(0,1fr);gap:14px;padding-bottom:20px;position:relative}
+.node:last-child{padding-bottom:0}
+.node::before{content:"";position:absolute;left:12px;top:24px;bottom:0;width:1px;background:var(--rule)}
+.node:last-child::before{display:none}
+.node .dot{
+  width:25px;height:25px;border-radius:50%;border:1px solid var(--rule);background:var(--panel);
+  display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--ink-3);z-index:1;
+}
+.node.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.node.active .dot{background:var(--azure);border-color:var(--azure);color:#fff}
+.node h4{margin:0;font-size:13.5px;font-weight:500;font-family:var(--sans);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.node .meta{margin:4px 0 0;font-size:12px;color:var(--ink-3)}
+.node .amount{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+
+/* ---------- flow ---------- */
+.flow-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.flow-col{background:var(--panel);padding:16px 17px}
+.flow-col h4{margin:0 0 4px;font-family:var(--serif);font-size:14.5px;font-weight:600}
+.flow-col .who{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--taupe);margin-bottom:11px}
+.flow-col ol{margin:0;padding-left:0;list-style:none;counter-reset:s}
+.flow-col li{position:relative;padding-left:26px;margin-bottom:9px;font-size:12.8px;color:var(--ink-2);line-height:1.55}
+.flow-col li::before{
+  counter-increment:s;content:counter(s);position:absolute;left:0;top:1px;
+  width:17px;height:17px;border-radius:50%;background:var(--azure-soft);color:var(--azure-deep);
+  font-family:var(--mono);font-size:10px;display:grid;place-items:center;
+}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:24px;align-items:start}
+.split > .panel:last-child{margin-bottom:0}
+.prose p{margin:0 0 11px;color:var(--ink-2);max-width:66ch}
+.prose p:last-child{margin-bottom:0}
+.callout{border-left:3px solid var(--taupe);background:var(--taupe-soft);padding:13px 16px;font-size:12.8px;color:var(--ink-2);line-height:1.65}
+.callout b{color:var(--ink)}
+
+/* ---------- log ---------- */
+.log{font-family:var(--mono);font-size:12px;line-height:1.9}
+.log div{display:grid;grid-template-columns:150px 132px minmax(0,1fr);gap:16px;padding:6px 0;border-bottom:1px solid var(--rule-soft)}
+.log div:last-child{border-bottom:0}
+.log .ts{color:var(--ink-3)}
+.log .ac{color:var(--azure-deep)}
+@media (max-width:760px){
+  .shell{flex-direction:column}
+  .rail{flex:none;width:100%;flex-direction:row;flex-wrap:wrap;padding:10px;gap:4px;border-right:0;border-bottom:1px solid var(--rule)}
+  .rail-label,.rail-foot{display:none}
+  .rail button{width:auto;border-left:0;border-bottom:2px solid transparent;padding:7px 11px}
+  .rail button[aria-current="true"]{border-left:0;border-bottom-color:var(--azure)}
+  main{padding:20px 16px 48px}
+  .log div{grid-template-columns:1fr;gap:2px}
+}
+footer{padding:18px 30px 34px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:11.5px;line-height:1.7;background:var(--mist)}
+</style>
+
+<div class="demo-strip">
+  <b>内部演示原型</b>
+  <span>全部船舶、竞买人、金额与单证均为示例数据，不对应任何真实交易 · 用于业务架构说明与流程演示</span>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">航</div>
+    <div class="brand-text">
+      <h1>国际船舶交易服务平台</h1>
+      <p>上海航运交易所 × 香港金融交易及服务有限公司　经纪联合体</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="stamp">
+      演示数据基准日<b>2026-09-04</b>
+    </div>
+    <button class="theme-btn" id="theme-btn" type="button">切换深浅色</button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="平台功能">
+    <div class="rail-label">交易管理</div>
+    <button type="button" data-view="board" aria-current="true"><i>01</i>交易看板</button>
+    <button type="button" data-view="listings"><i>02</i>船舶挂牌</button>
+    <button type="button" data-view="bidders"><i>03</i>竞买人与合规</button>
+    <button type="button" data-view="auction"><i>04</i>竞价与定标</button>
+    <button type="button" data-view="settlement"><i>05</i>资金与结算</button>
+    <div class="rail-label" style="padding-top:18px">平台说明</div>
+    <button type="button" data-view="flow"><i>06</i>业务流程与分工</button>
+    <button type="button" data-view="log"><i>07</i>操作留痕</button>
+    <div class="rail-foot">
+      演示原型 v0.1<br>
+      数据为示例，不含真实客户信息
+    </div>
+  </nav>
+
+  <main>
+    <!-- ============ 交易看板 ============ -->
+    <section id="view-board">
+      <div class="page-head">
+        <div class="eyebrow">Trading Board</div>
+        <h2>交易看板</h2>
+        <p>平台在管标的、竞买人合规状态与资金节点的当前概览。示例口径为单一试点年度。</p>
+      </div>
+
+      <div class="tiles">
+        <div class="tile"><div class="k">在管标的</div><div class="v">6<span class="u">艘</span></div><div class="sub">合计 336,000 载重吨</div></div>
+        <div class="tile"><div class="k">挂牌标的总价</div><div class="v">179.3<span class="u">百万美元</span></div><div class="sub">以起拍价合计</div></div>
+        <div class="tile"><div class="k">在册竞买人</div><div class="v">6<span class="u">家</span></div><div class="sub">KYC 通过 3 · 处理中 3</div></div>
+        <div class="tile"><div class="k">保证金在账</div><div class="v">7.05<span class="u">百万美元</span></div><div class="sub">经纪业务专户 · 逐笔留痕</div></div>
+        <div class="tile"><div class="k">已划付价款</div><div class="v">21.30<span class="u">百万美元</span></div><div class="sub">凭业务证明文件划付</div></div>
+      </div>
+
+      <div class="pipeline" role="list" aria-label="交易阶段分布">
+        <div class="stage on" role="listitem"><div class="n">STAGE 01</div><div class="t">挂牌公告</div><div class="c">1</div></div>
+        <div class="stage on" role="listitem"><div class="n">STAGE 02</div><div class="t">竞价中</div><div class="c">1</div></div>
+        <div class="stage on" role="listitem"><div class="n">STAGE 03</div><div class="t">待定标</div><div class="c">1</div></div>
+        <div class="stage on" role="listitem"><div class="n">STAGE 04</div><div class="t">已定标 · 待签约</div><div class="c">1</div></div>
+        <div class="stage on" role="listitem"><div class="n">STAGE 05</div><div class="t">交付结算中</div><div class="c">1</div></div>
+        <div class="stage" role="listitem"><div class="n">STAGE 06</div><div class="t">已交割归档</div><div class="c">1</div></div>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-head"><h3>待办事项</h3><span class="note">按时限先后</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>事项</th><th>标的</th><th>责任方</th><th>时限</th></tr></thead>
+              <tbody>
+                <tr><td>制裁筛查命中复核</td><td>PACIFIC ENVOY</td><td>我方合规</td><td class="num">T+1</td></tr>
+                <tr><td>补充 UBO 股权结构图</td><td>—</td><td>竞买人</td><td class="num">T+3</td></tr>
+                <tr><td>出具定标业务证明文件</td><td>PACIFIC ENVOY</td><td>上海航运交易所</td><td class="num">T+2</td></tr>
+                <tr><td>未中标保证金原路退回</td><td>GOLDEN HARVEST</td><td>我方结算</td><td class="num">T+5</td></tr>
+                <tr><td>交船单证核对</td><td>SILVER STRAIT</td><td>我方经纪</td><td class="num">T+7</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>专户资金状态</h3><span class="note">示例币种 USD</span></div>
+          <div class="panel-body">
+            <dl style="margin:0">
+              <div class="kv"><dt>竞价保证金在账</dt><dd>5,700,000</dd></div>
+              <div class="kv"><dt>已转为价款的保证金</dt><dd>1,350,000</dd></div>
+              <div class="kv"><dt>待退回保证金</dt><dd>1,350,000</dd></div>
+              <div class="kv"><dt>本期已划付卖方</dt><dd>21,300,000</dd></div>
+              <div class="kv"><dt>银行水单已同步</dt><dd class="txt"><span class="chip ok">全部同步</span></dd></div>
+              <div class="kv"><dt>换汇 / 结售汇</dt><dd class="txt"><span class="chip idle">不适用</span></dd></div>
+            </dl>
+            <div class="callout" style="margin-top:15px">
+              专户仅用于本项目经纪服务项下资金流转，与自有经营资金独立核算；资金划付以<b>上海航运交易所出具的阶段性业务证明文件</b>为依据。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 船舶挂牌 ============ -->
+    <section id="view-listings" hidden>
+      <div id="listings-list">
+        <div class="page-head">
+          <div class="eyebrow">Vessel Listings</div>
+          <h2>船舶挂牌</h2>
+          <p>由上海航运交易所组织挂牌与竞价定标，我方负责竞买人尽调、专户管理与结算执行。点击任一行查看标的详情。</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>在管标的　6 艘</h3><span class="note">价格单位：美元</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>船名 / 船型</th><th>IMO</th><th>载重吨</th><th>建造年 / 船厂</th><th>船旗</th><th>船级社</th><th>起拍价</th><th>状态</th></tr>
+              </thead>
+              <tbody id="vessel-rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="listings-detail" hidden>
+        <button class="back-btn" type="button" id="back-to-list">← 返回挂牌列表</button>
+        <div class="page-head">
+          <div class="eyebrow" id="d-eyebrow">Vessel Particulars</div>
+          <h2 id="d-name">—</h2>
+          <p id="d-sub">—</p>
+        </div>
+        <div class="detail-grid">
+          <div>
+            <div class="panel">
+              <div class="panel-head"><h3>船舶要素</h3><span class="note">Particulars</span></div>
+              <dl class="specs" id="d-specs"></dl>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>交易单证</h3><span class="note">归档状态</span></div>
+              <div class="panel-body"><ul class="doclist" id="d-docs"></ul></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel">
+              <div class="price-block">
+                <div class="lbl">起拍价</div>
+                <div class="amt" id="d-price"><em>USD</em>—</div>
+              </div>
+              <div class="panel-body">
+                <dl style="margin:0" id="d-terms"></dl>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>合规筛查</h3></div>
+              <div class="panel-body">
+                <dl style="margin:0" id="d-screen"></dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 竞买人与合规 ============ -->
+    <section id="view-bidders" hidden>
+      <div class="page-head">
+        <div class="eyebrow">Bidder Onboarding &amp; Compliance</div>
+        <h2>竞买人与合规</h2>
+        <p>竞买人在平台提交主体资料与最终受益人信息，由我方执行背景核实与制裁筛查；未通过者不具备竞价资格。</p>
+      </div>
+
+      <div class="tiles">
+        <div class="tile"><div class="k">已通过</div><div class="v" style="color:var(--ok)">3</div><div class="sub">具备竞价资格</div></div>
+        <div class="tile"><div class="k">审核中</div><div class="v" style="color:var(--azure)">1</div><div class="sub">资料齐备待复核</div></div>
+        <div class="tile"><div class="k">待补件</div><div class="v" style="color:var(--warn)">1</div><div class="sub">已发出补件通知</div></div>
+        <div class="tile"><div class="k">筛查命中复核</div><div class="v" style="color:var(--crit)">1</div><div class="sub">暂停办理</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>竞买人名册</h3><span class="note">示例主体，非真实客户</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>竞买主体</th><th>注册地</th><th>最终受益人</th><th>资料完整度</th><th>制裁筛查</th><th>KYC 状态</th></tr></thead>
+            <tbody id="bidder-rows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-head"><h3>尽调核对项</h3></div>
+          <div class="panel-body">
+            <ul class="doclist">
+              <li><div class="dn"><i>01</i>注册证书 / 商业登记</div><span class="chip ok">已收齐</span></li>
+              <li><div class="dn"><i>02</i>股权结构与最终受益人声明</div><span class="chip warn">1 家待补</span></li>
+              <li><div class="dn"><i>03</i>董事及授权签署人身份文件</div><span class="chip ok">已收齐</span></li>
+              <li><div class="dn"><i>04</i>资金来源说明</div><span class="chip ok">已收齐</span></li>
+              <li><div class="dn"><i>05</i>付款账户确认函（须与竞买主体同名）</div><span class="chip ok">已收齐</span></li>
+              <li><div class="dn"><i>06</i>制裁与不利信息筛查</div><span class="chip crit">1 家复核中</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>标的船舶筛查</h3><span class="note">按 IMO 号</span></div>
+          <div class="panel-body">
+            <ul class="doclist">
+              <li><div class="dn"><i>01</i>船舶及船东制裁名单比对</div><span class="chip ok">6 / 6 通过</span></li>
+              <li><div class="dn"><i>02</i>历史船东与更名记录</div><span class="chip ok">6 / 6 通过</span></li>
+              <li><div class="dn"><i>03</i>船旗变更频次</div><span class="chip warn">1 艘需说明</span></li>
+              <li><div class="dn"><i>04</i>AIS 信号中断记录</div><span class="chip ok">未见异常</span></li>
+              <li><div class="dn"><i>05</i>船对船过驳作业史</div><span class="chip ok">未见异常</span></li>
+            </ul>
+            <div class="callout" style="margin-top:15px">
+              二手油船为制裁审查重点船型。示例中 <b>PACIFIC ENVOY</b> 因近三年两次变更船旗，已转入人工复核，复核完成前不予放行。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 竞价与定标 ============ -->
+    <section id="view-auction" hidden>
+      <div class="page-head">
+        <div class="eyebrow">Auction &amp; Award</div>
+        <h2>竞价与定标</h2>
+        <p>竞价由上海航运交易所组织，价高者得；截止时无人递交竞价书的按竞价失败处理。以下为示例标的的出价记录。</p>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>HAI YANG SPIRIT　竞价进行中</h3>
+            <span class="chip live">剩余 2 日 06 时</span>
+          </div>
+          <div class="panel-body">
+            <dl style="margin:0 0 15px">
+              <div class="kv"><dt>起拍价</dt><dd>USD 29,800,000</dd></div>
+              <div class="kv"><dt>当前最高价</dt><dd>USD 31,450,000</dd></div>
+              <div class="kv"><dt>加价幅度</dt><dd>USD 50,000</dd></div>
+              <div class="kv"><dt>竞价保证金</dt><dd>USD 1,500,000</dd></div>
+              <div class="kv"><dt>有效竞买人</dt><dd>3 家</dd></div>
+            </dl>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>时间</th><th>竞买人</th><th>出价</th></tr></thead>
+                <tbody>
+                  <tr><td class="num">09-04 11:42</td><td>Aurora Marine SPV Ltd</td><td class="num">31,450,000</td></tr>
+                  <tr><td class="num">09-04 11:28</td><td>Nan Hai Shipping Holdings Ltd</td><td class="num">31,200,000</td></tr>
+                  <tr><td class="num">09-04 10:55</td><td>Aurora Marine SPV Ltd</td><td class="num">30,600,000</td></tr>
+                  <tr><td class="num">09-03 16:20</td><td>Meridian Bulk Carriers Inc</td><td class="num">30,100,000</td></tr>
+                  <tr><td class="num">09-03 15:07</td><td>Nan Hai Shipping Holdings Ltd</td><td class="num">29,850,000</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>已定标标的</h3><span class="note">保证金处置</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>标的</th><th>中标方</th><th>成交价</th><th>保证金处置</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="vname">GOLDEN HARVEST<small>Supramax</small></td>
+                  <td>Meridian Bulk Carriers Inc</td>
+                  <td class="num">17,850,000</td>
+                  <td><span class="chip ok">转为价款</span></td>
+                </tr>
+                <tr>
+                  <td class="vname">GOLDEN HARVEST<small>未中标 2 家</small></td>
+                  <td>Orient Star Navigation Ltd 等</td>
+                  <td class="num">—</td>
+                  <td><span class="chip warn">原路退回处理中</span></td>
+                </tr>
+                <tr>
+                  <td class="vname">NORTH HARBOUR 8<small>Feeder 1,800 TEU</small></td>
+                  <td>Nan Hai Shipping Holdings Ltd</td>
+                  <td class="num">21,300,000</td>
+                  <td><span class="chip ok">已结清</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel-body" style="border-top:1px solid var(--rule)">
+            <div class="callout">
+              保证金去向仅有两条并行分支：<b>中标方留存并转为船舶价款的组成部分</b>；<b>未中标及竞价失败的以原币种、原金额退回原汇出账户</b>。不进行货币兑换、不加价、不留存差额。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 资金与结算 ============ -->
+    <section id="view-settlement" hidden>
+      <div class="page-head">
+        <div class="eyebrow">Funds &amp; Settlement</div>
+        <h2>资金与结算</h2>
+        <p>各交易节点达成后，由上海航运交易所审核交易真实性并出具阶段性业务证明文件，我方据此出具经纪意见并办理划付。</p>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-head"><h3>SILVER STRAIT　结算节点</h3><span class="chip live">进行中</span></div>
+          <div class="panel-body">
+            <ul class="nodes">
+              <li class="node done">
+                <div class="dot">✓</div>
+                <div>
+                  <h4>竞价保证金到账 <span class="chip ok">已完成</span></h4>
+                  <p class="meta"><span class="amount">USD 750,000</span> · 2026-07-18 入账 · 水单已同步甲方</p>
+                </div>
+              </li>
+              <li class="node done">
+                <div class="dot">✓</div>
+                <div>
+                  <h4>定标业务证明文件 <span class="chip ok">已出具</span></h4>
+                  <p class="meta">甲方出具编号 SSE-2026-0731-04 · 载明竞价结果及保证金处置方式</p>
+                </div>
+              </li>
+              <li class="node done">
+                <div class="dot">✓</div>
+                <div>
+                  <h4>首期款到账 <span class="chip ok">已完成</span></h4>
+                  <p class="meta"><span class="amount">USD 2,235,000</span> · 2026-08-06 入账 · 付款账户与竞买主体同名</p>
+                </div>
+              </li>
+              <li class="node active">
+                <div class="dot">4</div>
+                <div>
+                  <h4>船舶交付与过户 <span class="chip live">进行中</span></h4>
+                  <p class="meta">交船单证核对中 · 待甲方出具交付阶段业务证明文件</p>
+                </div>
+              </li>
+              <li class="node">
+                <div class="dot">5</div>
+                <div>
+                  <h4>尾款到账并划付卖方</h4>
+                  <p class="meta"><span class="amount">USD 11,915,000</span> · 待节点达成</p>
+                </div>
+              </li>
+              <li class="node">
+                <div class="dot">6</div>
+                <div>
+                  <h4>结清与归档</h4>
+                  <p class="meta">全套交易文件按监管要求留存归档</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>专户流水</h3><span class="note">逐笔留痕 · 示例</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>日期</th><th>摘要</th><th>方向</th><th>金额 USD</th></tr></thead>
+                <tbody>
+                  <tr><td class="num">08-28</td><td>NORTH HARBOUR 8 尾款划付卖方</td><td><span class="chip idle">出</span></td><td class="num">15,300,000</td></tr>
+                  <tr><td class="num">08-21</td><td>NORTH HARBOUR 8 尾款到账</td><td><span class="chip ok">入</span></td><td class="num">15,300,000</td></tr>
+                  <tr><td class="num">08-06</td><td>SILVER STRAIT 首期款到账</td><td><span class="chip ok">入</span></td><td class="num">2,235,000</td></tr>
+                  <tr><td class="num">08-02</td><td>GOLDEN HARVEST 未中标保证金退回</td><td><span class="chip idle">出</span></td><td class="num">900,000</td></tr>
+                  <tr><td class="num">07-18</td><td>SILVER STRAIT 竞价保证金到账</td><td><span class="chip ok">入</span></td><td class="num">750,000</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>业务证明文件</h3><span class="note">划付依据</span></div>
+            <div class="panel-body">
+              <ul class="doclist">
+                <li><div class="dn"><i>01</i>SSE-2026-0731-04　定标阶段</div><span class="chip ok">已核验</span></li>
+                <li><div class="dn"><i>02</i>SSE-2026-0805-01　首期款划转条件</div><span class="chip ok">已核验</span></li>
+                <li><div class="dn"><i>03</i>SSE-2026-09__-__　交付阶段</div><span class="chip idle">待出具</span></li>
+              </ul>
+              <div class="callout" style="margin-top:15px">
+                我方不得脱离甲方业务证明文件自行办理划付；遇账户限制、银行大额问询、监管核查或制裁筛查命中，第一时间书面通知并暂停履行相关义务。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 业务流程与分工 ============ -->
+    <section id="view-flow" hidden>
+      <div class="page-head">
+        <div class="eyebrow">Structure &amp; Workflow</div>
+        <h2>业务流程与分工</h2>
+        <p>经纪联合体以联合体名义分别与买方、卖方签署协议，共两套；船舶买卖合同由买卖双方直接签署，联合体不作为该合同当事人。</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>参与主体与职能</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>主体</th><th>身份</th><th>在本架构中的职能</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="vname">香港金融交易及服务有限公司</td>
+                <td>经纪联合体成员</td>
+                <td>交易对接；竞买人 KYC 与制裁筛查；开立并管理经纪业务专户；凭业务证明文件完成结算；出具经纪意见</td>
+              </tr>
+              <tr>
+                <td class="vname">上海航运交易所</td>
+                <td>经纪联合体成员</td>
+                <td>交易撮合与交易组织；组织竞价定标；提供买卖双方主体信息与注册文件；出具阶段性业务证明文件</td>
+              </tr>
+              <tr><td class="vname">买方</td><td>竞买人</td><td>缴纳竞价保证金；中标后签署买卖合同并按节点支付款项</td></tr>
+              <tr><td class="vname">卖方</td><td>船舶出让方</td><td>签署买卖合同；办理船舶交付与过户；收取款项</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flow-cols">
+        <div class="flow-col">
+          <h4>签约、尽调与竞价</h4>
+          <div class="who">Stage 01 — 06</div>
+          <ol>
+            <li>联合体分别与买方、卖方签署协议，共两份</li>
+            <li>航交所提供交易双方基础信息与注册文件</li>
+            <li>我方对竞买人及最终受益人执行背景核实与制裁筛查</li>
+            <li>开立经纪业务专户，向竞买人提供账户信息</li>
+            <li>各竞买人缴纳竞价保证金，逐笔留痕并同步水单</li>
+            <li>航交所组织竞价定标，价高者得</li>
+          </ol>
+        </div>
+        <div class="flow-col">
+          <h4>定标、交付与结算</h4>
+          <div class="who">Stage 07 — 12</div>
+          <ol start="7">
+            <li>航交所按竞价结果确定中标方</li>
+            <li>中标方与卖方直接签署船舶买卖合同</li>
+            <li>联合体双方各取得一份合同备份</li>
+            <li>买卖双方经航交所平台办理交付与过户</li>
+            <li>航交所出具阶段性业务证明文件，确认付款条件具备</li>
+            <li>我方凭业务证明文件划转款项并同步回单</li>
+          </ol>
+        </div>
+        <div class="flow-col">
+          <h4>保证金处置</h4>
+          <div class="who">并行分支，非先后步骤</div>
+          <ol>
+            <li>全部竞买人保证金缴入同一专户</li>
+            <li>航交所定标并通知我方</li>
+            <li><b>分支 A</b>　未中标／竞价失败：以原币种、原金额退回原缴纳账户</li>
+            <li><b>分支 B</b>　中标方保证金：留存不退回，转为船舶价款的组成部分</li>
+            <li>我方不承担换汇、货币兑换、结售汇职能，不收取兑换点差</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="split" style="margin-top:24px">
+        <div class="panel">
+          <div class="panel-head"><h3>平台在架构中的作用</h3></div>
+          <div class="panel-body prose">
+            <p>平台承载经纪职能的执行与留痕：挂牌与竞价在平台上组织，竞买人资料与尽调结论在平台上归集，经纪意见、业务证明文件与单证核对记录在平台上生成并归档。</p>
+            <p>每一笔资金动作都对应平台上一条可追溯的业务记录——谁在什么时间、依据哪一份业务证明文件、对哪一个标的办理了什么操作。</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>本原型的范围</h3></div>
+          <div class="panel-body prose">
+            <p>本页为业务架构说明用的界面原型，展示常态化开展后交易在平台上的组织方式。所有船舶、竞买人、金额、单证编号与时间均为示例数据。</p>
+            <p>平台未接入真实银行账户、未接入制裁筛查数据源、不承载任何真实交易。上线范围、持牌安排与合规要求以最终业务方案及外部法律意见为准。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 操作留痕 ============ -->
+    <section id="view-log" hidden>
+      <div class="page-head">
+        <div class="eyebrow">Audit Trail</div>
+        <h2>操作留痕</h2>
+        <p>平台对挂牌、尽调、竞价、业务证明文件核验与资金划付逐条留痕，作为经纪职能实际履行的工作记录。</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>近期操作记录</h3><span class="note">示例数据 · 倒序</span></div>
+        <div class="panel-body log">
+          <div><span class="ts">2026-09-04 11:42:07</span><span class="ac">竞价出价</span><span>Aurora Marine SPV Ltd 对 HAI YANG SPIRIT 出价 USD 31,450,000</span></div>
+          <div><span class="ts">2026-09-04 09:15:33</span><span class="ac">筛查复核</span><span>PACIFIC ENVOY 船旗变更记录转入人工复核，暂停放行</span></div>
+          <div><span class="ts">2026-09-03 17:02:11</span><span class="ac">单证核对</span><span>SILVER STRAIT 交船单证核对启动，待甲方出具交付阶段业务证明</span></div>
+          <div><span class="ts">2026-09-02 14:26:48</span><span class="ac">补件通知</span><span>向 Orient Star Navigation Ltd 发出 UBO 股权结构图补件通知，时限 T+3</span></div>
+          <div><span class="ts">2026-08-28 16:40:02</span><span class="ac">资金划付</span><span>依据 SSE-2026-0826-02 划付 NORTH HARBOUR 8 尾款 USD 15,300,000，回单已同步</span></div>
+          <div><span class="ts">2026-08-21 10:08:55</span><span class="ac">资金到账</span><span>NORTH HARBOUR 8 尾款 USD 15,300,000 入账，水单已同步甲方</span></div>
+          <div><span class="ts">2026-08-06 11:33:20</span><span class="ac">资金到账</span><span>SILVER STRAIT 首期款 USD 2,235,000 入账，付款账户与竞买主体同名，核验通过</span></div>
+          <div><span class="ts">2026-08-02 15:12:09</span><span class="ac">保证金退回</span><span>GOLDEN HARVEST 未中标保证金 USD 900,000 原路退回，原币种原金额</span></div>
+          <div><span class="ts">2026-07-31 09:47:36</span><span class="ac">证明核验</span><span>收讫甲方业务证明文件 SSE-2026-0731-04，载明定标结果及保证金处置方式</span></div>
+          <div><span class="ts">2026-07-18 13:55:41</span><span class="ac">资金到账</span><span>SILVER STRAIT 竞价保证金 USD 750,000 入账，逐笔留痕</span></div>
+          <div><span class="ts">2026-07-10 10:20:14</span><span class="ac">KYC 通过</span><span>Nan Hai Shipping Holdings Ltd 尽职调查与制裁筛查通过，取得竞价资格</span></div>
+          <div><span class="ts">2026-07-04 16:31:58</span><span class="ac">标的挂牌</span><span>HAI YANG SPIRIT（IMO 9812345）挂牌公告发布，起拍价 USD 29,800,000</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  内部演示原型 · 香港金融交易及服务有限公司　|　本页所有船舶、竞买人、金额、单证编号与时间均为示例数据，不对应任何真实交易、真实客户或真实账户。<br>
+  平台未接入银行账户与制裁筛查数据源。业务范围、持牌安排与合规要求以最终业务方案及外部法律意见为准。
+</footer>
+
+<script>
+const VESSELS = [
+  {
+    id:"hys", name:"HAI YANG SPIRIT", cn:"海洋之光", type:"MR2 成品油船 / Product Tanker",
+    imo:"9812345", dwt:"49,800", built:"2019", yard:"现代尾浦造船", flag:"马绍尔群岛", cls:"DNV",
+    price:"29,800,000", deposit:"1,500,000", status:["live","竞价中"],
+    loa:"183.0 m", beam:"32.2 m", draft:"13.2 m", engine:"MAN B&W 6G50ME-C9.5", tanks:"12 舱 / 涂层 Marineline",
+    speed:"14.5 节", cargo:"53,000 m³", survey:"特检 2029-04", position:"新加坡锚地",
+    terms:[["竞价保证金","USD 1,500,000"],["加价幅度","USD 50,000"],["竞价截止","2026-09-06 17:00 HKT"],["交船地点","新加坡"],["交船窗口","2026-11 / 12"],["有效竞买人","3 家"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","ok","近三年无变更"],["AIS 中断记录","ok","未见异常"],["STS 过驳作业史","ok","未见异常"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["最近一次特检报告","ok","已归档"],["无抵押 / 无留置声明","warn","待卖方补充"],["买卖合同副本","idle","定标后取得"]]
+  },
+  {
+    id:"pe", name:"PACIFIC ENVOY", cn:"太平洋使者", type:"LR2 成品油船 / Product Tanker",
+    imo:"9901234", dwt:"114,500", built:"2023", yard:"大连中远海运重工", flag:"利比里亚", cls:"LR",
+    price:"83,500,000", deposit:"4,200,000", status:["warn","待定标 · 筛查复核"],
+    loa:"249.9 m", beam:"44.0 m", draft:"15.1 m", engine:"WinGD 6X62DF", tanks:"12 舱 / 涂层 Intersleek",
+    speed:"14.8 节", cargo:"124,000 m³", survey:"特检 2033-02", position:"富查伊拉",
+    terms:[["竞价保证金","USD 4,200,000"],["加价幅度","USD 100,000"],["竞价截止","已截止"],["交船地点","富查伊拉"],["交船窗口","2026-12 / 2027-01"],["有效竞买人","2 家"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","crit","近三年两次变更 · 人工复核中"],["AIS 中断记录","warn","1 次 · 已取得说明"],["STS 过驳作业史","ok","未见异常"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["船旗变更说明函","warn","复核中"],["无抵押 / 无留置声明","ok","已归档"],["买卖合同副本","idle","定标后取得"]]
+  },
+  {
+    id:"gh", name:"GOLDEN HARVEST", cn:"金穗", type:"Supramax 散货船 / Bulk Carrier",
+    imo:"9701122", dwt:"56,700", built:"2015", yard:"中船黄埔文冲", flag:"巴拿马", cls:"NK",
+    price:"17,200,000", deposit:"900,000", status:["ok","已定标 · 待签约"],
+    loa:"190.0 m", beam:"32.3 m", draft:"12.8 m", engine:"MAN B&W 6S50MC-C", tanks:"5 舱 5 口 / 吊机 4×30t",
+    speed:"14.0 节", cargo:"71,600 m³ 谷物舱容", survey:"特检 2030-06", position:"青岛",
+    terms:[["成交价","USD 17,850,000"],["中标方","Meridian Bulk Carriers Inc"],["定标日","2026-08-28"],["交船地点","青岛"],["交船窗口","2026-10"],["未中标退款","2 家 · 处理中"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","ok","近三年无变更"],["AIS 中断记录","ok","未见异常"],["STS 过驳作业史","ok","不适用"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["定标业务证明文件","ok","SSE-2026-0828-07"],["无抵押 / 无留置声明","ok","已归档"],["买卖合同副本","warn","待双方签署后提交"]]
+  },
+  {
+    id:"em", name:"EVER MERIDIAN", cn:"永子午", type:"Handysize 散货船 / Bulk Carrier",
+    imo:"9601357", dwt:"38,200", built:"2012", yard:"日本大岛造船", flag:"中国香港", cls:"ClassNK",
+    price:"12,600,000", deposit:"650,000", status:["idle","挂牌公告"],
+    loa:"180.0 m", beam:"30.0 m", draft:"10.4 m", engine:"MAN B&W 5S46MC-C", tanks:"5 舱 5 口 / 吊机 4×30t",
+    speed:"13.5 节", cargo:"47,400 m³ 谷物舱容", survey:"特检 2027-09", position:"香港",
+    terms:[["竞价保证金","USD 650,000"],["加价幅度","USD 50,000"],["竞价截止","2026-09-19 17:00 HKT"],["交船地点","香港"],["交船窗口","2026-11"],["已登记意向","2 家"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","ok","近三年无变更"],["AIS 中断记录","ok","未见异常"],["STS 过驳作业史","ok","不适用"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["最近一次特检报告","ok","已归档"],["无抵押 / 无留置声明","idle","挂牌期内提交"],["买卖合同副本","idle","定标后取得"]]
+  },
+  {
+    id:"ss", name:"SILVER STRAIT", cn:"银海峡", type:"Panamax 散货船 / Bulk Carrier",
+    imo:"9552468", dwt:"76,000", built:"2011", yard:"常石造船 Tsuneishi", flag:"新加坡", cls:"ABS",
+    price:"14,900,000", deposit:"750,000", status:["live","交付结算中"],
+    loa:"225.0 m", beam:"32.3 m", draft:"14.1 m", engine:"MAN B&W 6S60MC-C", tanks:"7 舱 7 口 / 无吊机",
+    speed:"14.2 节", cargo:"89,000 m³ 谷物舱容", survey:"特检 2028-11", position:"巴生港",
+    terms:[["成交价","USD 14,900,000"],["中标方","Aurora Marine SPV Ltd"],["已收款","USD 2,985,000"],["待收尾款","USD 11,915,000"],["交船地点","巴生港"],["交船窗口","2026-09 / 10"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","ok","近三年无变更"],["AIS 中断记录","ok","未见异常"],["STS 过驳作业史","ok","不适用"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["买卖合同副本","ok","已归档"],["定标业务证明文件","ok","SSE-2026-0731-04"],["交付阶段业务证明","idle","待甲方出具"]]
+  },
+  {
+    id:"nh8", name:"NORTH HARBOUR 8", cn:"北港八号", type:"支线集装箱船 / Feeder 1,800 TEU",
+    imo:"9750246", dwt:"24,800", built:"2016", yard:"扬子江船业", flag:"巴拿马", cls:"CCS",
+    price:"21,300,000", deposit:"1,100,000", status:["ok","已交割归档"],
+    loa:"172.0 m", beam:"27.6 m", draft:"9.5 m", engine:"MAN B&W 7S50ME-B9", tanks:"1,800 TEU / 冷藏插座 300",
+    speed:"19.0 节", cargo:"1,800 TEU", survey:"特检 2031-05", position:"已交付买方",
+    terms:[["成交价","USD 21,300,000"],["中标方","Nan Hai Shipping Holdings Ltd"],["交割日","2026-08-28"],["已划付卖方","USD 21,300,000"],["交船地点","上海"],["状态","已结清归档"]],
+    screen:[["船舶制裁名单","ok","未命中"],["船东 / 历史船东","ok","未命中"],["船旗变更记录","ok","近三年无变更"],["AIS 中断记录","ok","未见异常"],["STS 过驳作业史","ok","不适用"]],
+    docs:[["船舶登记证书","ok","已归档"],["船级证书","ok","已归档"],["买卖合同副本","ok","已归档"],["交付确认书","ok","已归档"],["结算业务证明文件","ok","SSE-2026-0826-02"]]
+  }
+];
+
+const BIDDERS = [
+  ["Aurora Marine SPV Ltd","马绍尔群岛","Chan K.W.（持股 100%）","ok","6 / 6","ok","未命中","ok","已通过"],
+  ["Nan Hai Shipping Holdings Ltd","中国香港","南海航运集团（持股 100%）","ok","6 / 6","ok","未命中","ok","已通过"],
+  ["Meridian Bulk Carriers Inc","巴拿马","Tanaka H.（持股 60%）等 2 人","ok","6 / 6","ok","未命中","ok","已通过"],
+  ["Orient Star Navigation Ltd","塞浦路斯","待补充股权结构图","warn","5 / 6","ok","未命中","warn","待补件"],
+  ["Blue Ridge Maritime Pte Ltd","新加坡","Lim S.H.（持股 100%）","ok","6 / 6","ok","未命中","live","审核中"],
+  ["Caspian Trade Shipping FZE","阿联酋","待核实","warn","5 / 6","crit","关联方命中","crit","筛查复核 · 暂停"]
+];
+
+const $ = (s, r = document) => r.querySelector(s);
+
+/* ---- nav ---- */
+const railBtns = [...document.querySelectorAll(".rail button")];
+railBtns.forEach(btn => btn.addEventListener("click", () => {
+  railBtns.forEach(b => b.setAttribute("aria-current", String(b === btn)));
+  document.querySelectorAll("main > section").forEach(s => { s.hidden = true; });
+  $("#view-" + btn.dataset.view).hidden = false;
+  if (btn.dataset.view === "listings") showList();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}));
+
+/* ---- theme ---- */
+$("#theme-btn").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark"
+    : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+});
+
+/* ---- vessel table ---- */
+const rows = $("#vessel-rows");
+VESSELS.forEach(v => {
+  const tr = document.createElement("tr");
+  tr.className = "clickable";
+  tr.tabIndex = 0;
+  tr.innerHTML =
+    '<td class="vname">' + v.name + "<small>" + v.type + "</small></td>" +
+    '<td class="imo">' + v.imo + "</td>" +
+    '<td class="num">' + v.dwt + "</td>" +
+    "<td>" + v.built + '<br><small style="color:var(--ink-3)">' + v.yard + "</small></td>" +
+    "<td>" + v.flag + "</td>" +
+    "<td>" + v.cls + "</td>" +
+    '<td class="num">' + v.price + "</td>" +
+    '<td><span class="chip ' + v.status[0] + '">' + v.status[1] + "</span></td>";
+  const open = () => showDetail(v);
+  tr.addEventListener("click", open);
+  tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+  rows.appendChild(tr);
+});
+
+function showList() {
+  $("#listings-list").hidden = false;
+  $("#listings-detail").hidden = true;
+}
+$("#back-to-list").addEventListener("click", showList);
+
+function showDetail(v) {
+  $("#listings-list").hidden = true;
+  $("#listings-detail").hidden = false;
+  $("#d-eyebrow").textContent = "IMO " + v.imo + " · " + v.flag + " 船旗";
+  $("#d-name").textContent = v.name + "　" + v.cn;
+  $("#d-sub").textContent = v.type + " · " + v.dwt + " 载重吨 · " + v.built + " 年 " + v.yard + " 建造 · 船级 " + v.cls;
+
+  const specs = [
+    ["载重吨 DWT", v.dwt, ""], ["总长 LOA", v.loa, ""], ["型宽 Beam", v.beam, ""],
+    ["设计吃水", v.draft, ""], ["主机", v.engine, "txt"], ["舱室配置", v.tanks, "txt"],
+    ["服务航速", v.speed, ""], ["舱容 / 箱位", v.cargo, ""], ["下次特别检验", v.survey, ""],
+    ["当前船位", v.position, "txt"], ["船旗国", v.flag, "txt"], ["船级社", v.cls, "txt"]
+  ];
+  $("#d-specs").innerHTML = specs.map(s =>
+    '<div class="spec"><dt>' + s[0] + "</dt><dd class=\"" + s[2] + '">' + s[1] + "</dd></div>").join("");
+
+  $("#d-price").innerHTML = "<em>USD</em>" + v.price;
+  $("#d-terms").innerHTML = v.terms.map(t =>
+    '<div class="kv"><dt>' + t[0] + "</dt><dd>" + t[1] + "</dd></div>").join("");
+  $("#d-screen").innerHTML = v.screen.map(s =>
+    '<div class="kv"><dt>' + s[0] + '</dt><dd class="txt"><span class="chip ' + s[1] + '">' + s[2] + "</span></dd></div>").join("");
+  $("#d-docs").innerHTML = v.docs.map((d, i) =>
+    '<li><div class="dn"><i>' + String(i + 1).padStart(2, "0") + "</i>" + d[0] +
+    '</div><span class="chip ' + d[1] + '">' + d[2] + "</span></li>").join("");
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+/* ---- bidders ---- */
+$("#bidder-rows").innerHTML = BIDDERS.map(b =>
+  '<tr><td class="vname">' + b[0] + "</td><td>" + b[1] + "</td><td>" + b[2] +
+  '</td><td><span class="chip ' + b[3] + '">' + b[4] + "</span></td>" +
+  '<td><span class="chip ' + b[5] + '">' + b[6] + "</span></td>" +
+  '<td><span class="chip ' + b[7] + '">' + b[8] + "</span></td></tr>").join("");
+</script>
