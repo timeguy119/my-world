@@ -551,7 +551,7 @@ footer{background:#6a7280;color:rgba(255,255,255,.82)}
     </section>
     <section class="box" style="margin-top:14px">
       <div class="bh"><h3>业务流程</h3>
-        <a class="more" href="https://claude.ai/code/artifact/75645567-b405-4893-85ee-840bb67600ad" target="_blank" rel="noopener" title="交易平台演示">›</a></div>
+        <a class="more" data-terminal href="https://claude.ai/code/artifact/75645567-b405-4893-85ee-840bb67600ad" target="_blank" rel="noopener" title="交易平台演示">›</a></div>
       <div class="bh-rule"></div>
       <div class="bb">
         <div class="bizrow">
@@ -562,7 +562,7 @@ footer{background:#6a7280;color:rgba(255,255,255,.82)}
           <div class="bizcard"><div class="n">DEPOSIT</div><h4>保证金处置</h4>
             <p>全部竞买人保证金缴入同一专户。中标方保证金留存并转为船舶价款的组成部分；未中标及竞价失败的以原币种、原金额退回原缴纳账户。公司不承担换汇、货币兑换、结售汇职能，不收取兑换点差。</p></div>
         </div>
-        <p style="margin:14px 0 0;font-size:12.5px;color:var(--ink-3)">交易平台界面演示：<a href="https://claude.ai/code/artifact/75645567-b405-4893-85ee-840bb67600ad" target="_blank" rel="noopener" style="color:var(--blue)">打开演示 ›</a></p>
+        <p style="margin:14px 0 0;font-size:12.5px;color:var(--ink-3)">交易平台界面演示：<a data-terminal href="https://claude.ai/code/artifact/75645567-b405-4893-85ee-840bb67600ad" target="_blank" rel="noopener" style="color:var(--blue)">打开演示 ›</a></p>
       </div>
     </section>
   </div>
@@ -906,4 +906,10 @@ label();
 
 document.getElementById("totop").addEventListener("click", () =>
   window.scrollTo({ top: 0, behavior: "smooth" }));
+
+/* ---- terminal link: use the sibling file when opened offline / self-hosted ---- */
+(function () {
+  if (location.protocol === "https:" && location.hostname.endsWith("claude.ai")) return;
+  document.querySelectorAll("[data-terminal]").forEach(a => { a.href = "index.html"; });
+})();
 </script>
