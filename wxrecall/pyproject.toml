@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wxrecall"
+version = "0.1.0"
+description = "本地记录微信聊天并保留被撤回的消息（只读窗口，不注入、不联网）"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+windows = ["uiautomation>=2.0.18", "pillow>=10.0.0"]
+
+[project.scripts]
+wxrecall = "wxrecall.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["wxrecall*"]

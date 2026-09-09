@@ -1,0 +1,8 @@
+# Core needs nothing beyond the standard library — the diffing, storage and
+# export layers run anywhere Python 3.9+ does.
+
+# Windows only: the accessibility backend that reads the WeChat window.
+uiautomation>=2.0.18; sys_platform == "win32"
+
+# Optional: pre-recall screenshots (`watch --screenshots DIR`).
+pillow>=10.0.0; sys_platform == "win32"
